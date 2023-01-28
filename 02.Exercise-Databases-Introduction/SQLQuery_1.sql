@@ -3,9 +3,9 @@ CREATE DATABASE Minions
 USE [Minions]
 
 CREATE TABLE [Minions](
-    Id INT,
-    [Name] VARCHAR(100),
-    Age INT
+    Id      INT,
+    [Name]  VARCHAR(100),
+    Age     INT
 )
 
 CREATE TABLE [Towns]( 
