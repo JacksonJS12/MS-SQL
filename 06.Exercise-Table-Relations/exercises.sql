@@ -1,6 +1,6 @@
---CREATE DATABASE [EntityRelationsDemo2023]
+CREATE DATABASE [EntityRelationsDemo2023]
 
---GO
+GO
 
 USE [EntityRelationsDemo2023]
 
@@ -170,3 +170,37 @@ CREATE TABLE [Payments]
     [PaymentAmount] DECIMAL(8, 2) NOT NULL,
     [StudentID] INT FOREIGN KEY REFERENCES [Students]([StudentID]) NOT NULL
  )
+
+ALTER TABLE [Students]
+ADD UNIQUE ([StudentNumber])
+
+INSERT INTO [Majors]
+        VALUES  
+                ('Pesho')
+
+INSERT INTO [Students]([StudentName], [StudentNumber], [MajorID])
+        VALUES  
+                ('Tosho', '941220005', 1)
+
+INSERT INTO [Agenda]
+        VALUES  
+                (1,1)
+        
+--Problem 09
+GO 
+
+USE [Geography]
+
+GO
+
+SELECT  [m].[MountainRange],
+        [p].[PeakName],
+        [p].[Elevation]
+    FROM [Peaks]
+        AS [p]
+    LEFT JOIN [Mountains]
+        AS [m]
+        ON [p].[MountainId] = [m].[Id]
+     WHERE [m].[MountainRange] = 'Rila'
+    ORDER BY [p].[Elevation] DESC
+
