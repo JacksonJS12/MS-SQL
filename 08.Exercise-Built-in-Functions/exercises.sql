@@ -107,7 +107,7 @@ GO
 
 -- Probelem 12
 ---- Method A
-SELECT  [ConutryName]
+SELECT  [CountryName]
     AS  [Country Name],
         [ISOCode]
     AS  [ISO Code]
@@ -116,10 +116,61 @@ SELECT  [ConutryName]
 ORDER BY [ISO Code]
 
 ---- Method B
-SELECT  [ConutryName]
+SELECT  [CountryName]
     AS  [Country Name],
         [ISOCode]
     AS  [ISO Code]
    FROM [Countries]
-  WHERE LEN([CountryName]) - LEN(REPLACE(LOWER([CountryName], 'a', ''))) >= 3
-ORDER BY [ISO Code]
+  WHERE LEN([CountryName]) - LEN(REPLACE(LOWER([CountryName]), 'a', '')) >= 3
+ORDER BY [ISO Code] 
+
+
+-- Problem 13
+SELECT [p].[PeakName],
+       [r].[RiverName],
+       LOWER(CONCAT(SUBSTRING([p].[PeakName], 1, LEN([p].[PeakName]) - 1), [r].[RiverName]))
+    AS [Mix] 
+  FROM [Peaks]
+    AS [p],
+       [Rivers]
+    AS [r]
+ WHERE RIGHT(LOWER([p].[PeakName]), 1) = LEFT(LOWER([r].[RiverName]), 1)
+ ORDER BY [Mix]
+
+
+ GO
+
+ USE [Diablo]
+
+ GO
+
+ -- Problem 15
+ SELECT [Username],
+        SUBSTRING([Email], CHARINDEX('@', [Email]) + 1, LEN([Email]) - CHARINDEX('@', [Email]))
+    AS  [Email Provider]
+   FROM [Users] 
+ORDER BY[Email Provider],
+        [Username]
+
+    
+-- Problem 17
+  SELECT [Name]
+      AS [Game],
+         CASE
+            WHEN DATEPART(HOUR, [Start]) > 0 AND DATEPART(HOUR, [Start]) < 12 THEN 'Morning'
+            WHEN DATEPART(HOUR, [Start]) >= 12 AND DATEPART(HOUR, [Start]) < 18 THEN 'Afternoon'
+            ELSE  'Evening'
+         END
+      AS [Part of the Day],
+         CASE
+            WHEN [Duration] <= 3 THEN 'Extra Short'
+            WHEN [Duration] BETWEEN 4 AND 6 THEN 'Short'
+            WHEN [Duration] > 6 THEN 'Long'
+            ELSE 'Extra Long'
+         END
+      AS [Duration]
+    FROM [Games]
+      AS [g]
+ORDER BY [Game],
+         [Duration],
+         [Part of the Day] 
