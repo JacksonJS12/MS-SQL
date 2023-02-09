@@ -61,3 +61,44 @@ INNER JOIN [Employees]
         ON [e].[EmployeeID] = [m].[EmployeeID]
      WHERE [e].[ManagerID] IN (3, 7)
   ORDER BY [m].[EmployeeID]
+
+
+
+GO
+
+USE [Geography]
+
+GO
+-- Problem 12
+    SELECT [mc].[CountryCode],
+           [m].[MountainRange],
+           [p].[PeakName],
+           [p].[Elevation]
+      FROM [MountainsCountries]
+        AS [mc]
+INNER JOIN [Countries]
+        AS [c]
+        ON [mc].[CountryCode] = [c].[CountryCode]
+INNER JOIN [Mountains]
+        AS [m]
+        ON [mc].[MountainId] = [m].[Id]
+INNER JOIN [Peaks]
+        AS [p]
+        ON [p].[MountainId] = [m].[Id]
+     WHERE [c].[CountryName] = 'Bulgaria' AND 
+           [p].[Elevation] > 2835
+  ORDER BY [p].[Elevation] DESC
+
+
+-- Problem 13
+   SELECT [CountryCode],
+          COUNT([MountainId])
+       AS [MountainRanges]
+     FROM [MountainsCountries]
+    WHERE [CountryCode] IN (
+                              SELECT [CountryCode]
+                                FROM [Countries]
+                               WHERE [CountryName] IN ('United States', 'Russia', 'Bulgaria')
+                           )
+ GROUP BY [CountryCode]
+
