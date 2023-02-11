@@ -85,3 +85,25 @@ SELECT SUM([Difference])
              AS [Difference]
            FROM [WizzardDeposits] 
        ) AS [DifferenceSubQuery]
+
+
+GO
+
+USE [SoftUni]
+
+GO
+-- Problem 18
+ SELECT 
+ DISTINCT [DepartmentID],
+          [Salary]
+     FROM (
+           SELECT [DepartmentID],
+                  [Salary],
+                  DENSE_RANK() OVER(PARTITION BY [DepartmentID] ORDER BY [Salary] DESC)
+               AS [SalaryRank]
+             FROM [Employees]
+          ) 
+       AS [SalaryRankingSuquery]
+    WHERE [SalaryRank] = 3
+        
+   
