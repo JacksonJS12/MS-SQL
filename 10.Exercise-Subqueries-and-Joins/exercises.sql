@@ -134,6 +134,19 @@ INNER JOIN [Peaks]
  GROUP BY [CountryCode]
 
 
+-- Problem 14
+  SELECT 
+  TOP (5) [c].[CountryName],
+          [r].[RiverName]
+	  FROM [Countries] AS [c]
+LEFT JOIN [CountriesRivers] AS [cr]
+		 ON [cr].[CountryCode] = [c].[CountryCode]
+LEFT JOIN [Rivers] AS [r]
+	    ON [r].[Id] = [cr].[RiverId]
+	 WHERE [c].[ContinentCode] = 'AF'
+ ORDER BY [c].[CountryName]
+ 
+
  -- Problem 15
     SELECT [ContinentCode],
            [CurrencyCode],
@@ -230,4 +243,4 @@ LEFT JOIN [Peaks]
  ORDER BY [Country],
           [Highest Peak Name]
 
-   
+
