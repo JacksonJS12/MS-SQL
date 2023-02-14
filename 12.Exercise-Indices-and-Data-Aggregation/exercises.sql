@@ -85,3 +85,65 @@ SELECT SUM([Difference])
              AS [Difference]
            FROM [WizzardDeposits] 
        ) AS [DifferenceSubQuery]
+
+
+GO
+
+USE [SoftUni]
+
+GO
+
+
+-- Problem 15
+SELECT *
+  INTO [EmplyeesWithSalaryOver30000]
+  FROM [Employees]
+ WHERE [Salary] > 30000
+
+DELETE 
+  FROM [EmplyeesWithSalaryOver30000]
+ WHERE [ManagerID] = 42
+
+UPDATE [EmplyeesWithSalaryOver30000]
+   SET [Salary] += 5000
+ WHERE [DepartmentID] = 1
+
+   SELECT [DepartmentID],
+		  AVG([Salary])
+       AS [AverageSalary]
+     FROM [EmplyeesWithSalaryOver30000]
+ GROUP BY [DepartmentID]
+
+-- Problem 18
+ SELECT 
+ DISTINCT [DepartmentID],
+          AVG([Salary])
+       AS [AverageSalary]
+     FROM (
+           SELECT [DepartmentID],
+                  [Salary],
+                  DENSE_RANK() OVER(PARTITION BY [DepartmentID] ORDER BY [Salary] DESC)
+               AS [SalaryRank]
+             FROM [Employees]
+          ) 
+       AS [SalaryRankingSuquery]
+    WHERE [SalaryRank] = 3
+        
+   
+-- Problem 19
+   SELECT 
+ TOP (10) [e].[FirstName],
+          [e].[LastName],
+          [e].[DepartmentID],
+          [e].[Salary]
+     FROM [Employees]
+       AS [e]
+    WHERE [e].[Salary] > (
+                         SELECT  AVG([Salary])
+                              AS [AverageSalary]
+                            FROM [Employees]
+                              AS [eSub]
+                           WHERE [eSub].[DepartmentID] = [e].[DepartmentID]
+                        GROUP BY [DepartmentID] 
+                     )
+ ORDER BY [e].[DepartmentID]
