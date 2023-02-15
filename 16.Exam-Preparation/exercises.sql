@@ -157,3 +157,99 @@ LEFT JOIN [Animals]
  GROUP BY [o].[Name]  
  ORDER BY [CountOfAnimals] DESC,
           [Owner]
+
+-- Problem 08
+      SELECT CONCAT([o].[Name], '-', [a].[Name])
+        AS [OwnersAnimals],
+        [o].[PhoneNumber],
+        [ac].[CageId]
+        FROM [Owners]
+          AS [o]
+  INNER JOIN [Animals]
+          AS [a]
+          ON [o].[Id] = [a].[OwnerId]
+  INNER JOIN [AnimalTypes]
+          AS [at]
+          ON [a].[AnimalTypeId] = [at].[Id]
+  INNER JOIN [AnimalsCages]
+          AS [ac]
+          ON [a].[Id] = [ac].[AnimalId] 
+      WHERE [at].[AnimalType] = 'Mammals'
+    ORDER BY [o].[Name],
+            [a].[Name] DESC
+
+
+-- Problem 09
+    SELECT [v].[Name],
+           [v].[PhoneNumber],
+           TRIM(REPLACE(REPLACE([v].[Address], 'Sofia', ''), ',', ''))
+        AS [Address]
+      FROM [Volunteers]
+        AS [v]
+INNER JOIN [VolunteersDepartments]
+        AS [vd]
+        ON [v].[DepartmentId] = [vd].[Id]
+     WHERE [vd].[DepartmentName] = 'Education program assistant' AND
+           [v].[Address] LIKE '%Sofia%'
+  ORDER BY [v].[Name]
+
+-- Problem 10
+    SELECT [a].[Name],
+           DATEPART(YEAR, [a].[BirthDate])
+        AS [BirthYear],
+           [at].[AnimalType]
+      FROM [Animals]
+           [a]
+INNER JOIN [AnimalTypes]
+        AS [at]
+        ON [a].[AnimalTypeId] = [at].[Id]
+     WHERE [OwnerId] IS NULL AND
+           DATEDIFF(YEAR, [a].[BirthDate], '01/01/2022') < 5 AND
+           [at].[AnimalType] <> 'Birds'
+  ORDER BY [a].[Name]
+
+GO
+-- Problem 11
+CREATE FUNCTION [udf_GetVolunteersCountFromADepartment] (@VolunteersDepartment VARCHAR(30))
+    RETURNS INT
+             AS
+          BEGIN
+                  DECLARE @departmentId INT;
+                  SET @departmentId = (
+                                          SELECT [Id]
+                                            FROM [VolunteersDepartments]
+                                           WHERE [DepartmentName] = @VolunteersDepartment
+                                      )
+                  DECLARE @departmentVoluntersCount INT;
+                  SET @departmentVoluntersCount = (
+                                                       SELECT COUNT(*)
+                                                              FROM [Volunteers]
+                                                             WHERE [DepartmentId] = @departmentId
+                                                  )
+                  RETURN @departmentVoluntersCount;
+            END
+
+GO
+
+SELECT dbo.udf_GetVolunteersCountFromADepartment ('Education program assistant')
+SELECT dbo.udf_GetVolunteersCountFromADepartment ('Guest engagement')
+
+GO
+-- Problem 12
+CREATE PROCEDURE [usp_AnimalsWithOwnersOrNot] (@AnimalName VARCHAR(30))
+              AS
+           BEGIN
+                      SELECT [a].[Name],
+                             ISNULL([o].[Name],  'For adoption')
+                          AS [OwnersName]
+                        FROM [Animals]
+                          AS [a]
+                   LEFT JOIN [Owners]
+                          AS [o]
+                          ON [a].[OwnerId] = [o].[Id]
+                       WHERE [a].[Name] = @AnimalName
+             END
+
+GO
+
+EXEC usp_AnimalsWithOwnersOrNot 'Pumpkinseed Sunfish'
