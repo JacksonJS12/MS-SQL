@@ -74,7 +74,7 @@ INSERT INTO [Animals]
 INSERT INTO [Volunteers]
             ([Name], [PhoneNumber], [Address], [AnimalId], [DepartmentId])
      VALUES 
-            ('Anita Kostova',	'0896365412',	'Sofia 5 Rosa str.',	15,	1),
+            ('Anita Kostova',	'0896365412',	'Sofia, 5 Rosa str.',	15,	1),
             ('Dimitur Stoev',	'0877564223',	null,	42,	4),
             ('Kalina Evtimova',	'0896321112',	'Silistra, 21 Breza str.',	9,	7),
             ('Stoyan Tomov',	'0898564100',	'Montana, 1 Bor str.',	18,	8),
@@ -83,6 +83,77 @@ INSERT INTO [Volunteers]
 
 
 -- Probelm 03
-SELECT [Id]
-  FROM [Owners]
- WHERE [Name] = 'Koloqn Stoqnov'
+    UPDATE [Animals]
+    SET [OwnerId] = ( 
+                        SELECT [Id]
+                        FROM [Owners]
+                        WHERE [Name] = 'Kaloqn Stoqnov'
+                    )
+    WHERE [OwnerId] IS NULL
+
+SELECT *
+  FROM [Animals]
+ WHERE [OwnerId] IS NULL
+
+
+-- Problem 04
+SELECT *
+  FROM [VolunteersDepartments] 
+ WHERE [DepartmentName] = 'Education program assistant'
+
+SELECT *
+  FROM [Volunteers]
+ WHERE [DepartmentId] = 2
+
+DELETE 
+  FROM [Volunteers]
+ WHERE [DepartmentId] = (
+                            SELECT [Id]
+                             FROM [VolunteersDepartments] 
+                            WHERE [DepartmentName] = 'Education program assistant'
+                        )
+
+DELETE 
+  FROM [VolunteersDepartments]
+ WHERE [DepartmentName] = 'Education program assistant'
+
+
+-- Problem 05
+  SELECT [Name],
+         [PhoneNumber],
+         [Address],
+         [AnimalId],
+         [DepartmentId]
+    FROM [Volunteers]
+ORDER BY [Name],
+         [AnimalId],
+         [DepartmentId]   
+
+
+-- Problem 06
+    SELECT [a].[Name],
+           [at].[AnimalType],
+           FORMAT([a].[BirthDate], 'dd.MM.yyyy')
+        AS [BirthDate]
+      FROM [Animals]
+        AS [a]
+INNER JOIN [AnimalTypes]
+        AS [at]
+        ON [a].[AnimalTypeId] = [at].[Id]
+  ORDER BY [a].[Name]
+
+
+-- Problem 07
+   SELECT 
+  TOP (5) [o].[Name]
+       AS [Owner],
+           COUNT([a].[Id])
+       AS [CountOfAnimals]
+     FROM [Owners]
+       AS [o]
+LEFT JOIN [Animals]
+       AS [a]
+       on [o].[Id] = [a].[OwnerId]
+ GROUP BY [o].[Name]  
+ ORDER BY [CountOfAnimals] DESC,
+          [Owner]
