@@ -125,7 +125,7 @@ ORDER BY [fd].[TicketPrice] DESC,
          [a].[AirportName] 
 
 
--- Problem 09
+-- Problem 08
    SELECT [a].[Id]
        AS [AircraftId],
           [a].[Manufacturer],
@@ -145,3 +145,113 @@ ORDER BY [fd].[TicketPrice] DESC,
    HAVING COUNT([fd].[Id]) >= 2
  ORDER BY 4 DESC,
           1
+
+
+-- Problem 09
+   SELECT [p].[FullName],
+          COUNT([a].[Id])
+       AS [CountOfAircraft],
+          SUM([fd].[TicketPrice])
+       AS [TotalPayed]
+     FROM [Passengers]
+       AS [p]
+     JOIN [FlightDestinations]
+       AS [fd]
+       ON [p].[Id] = [fd].[PassengerId]
+     JOIN [Aircraft]
+       AS [a]
+       ON [fd].[AircraftId] = [a].[Id]
+    WHERE SUBSTRING([p].[FullName], 2, 1) = 'a'
+ GROUP BY [p].[Id],
+          [p].[FullName]
+   HAVING COUNT([a].[Id]) > 1
+ ORDER BY [p].[FullName]
+
+
+-- Problem 10
+  SELECT [ap].[AirportName],
+         [fd].[Start]
+      AS [DayTime],
+         [fd].[TicketPrice],
+         [p].[FullName],
+         [a].[Manufacturer],
+         [a].[Model]
+    FROM [FlightDestinations]
+      AS [fd]
+    JOIN [Passengers]
+      AS [p]
+      ON [fd].[PassengerId] = [p].[Id]
+    JOIN [Aircraft]
+      AS [a]
+      ON [fd].[AircraftId] = [a].[Id]
+    JOIN [Airports]
+      AS [ap]
+      ON [fd].[AirportId] = [ap].[Id]
+   WHERE (DATEPART(HOUR, [fd].[Start]) BETWEEN 6 AND 20) AND
+         [fd].[TicketPrice] > 2500 
+ORDER BY [a].[Model]
+ 
+GO
+-- Problem 11
+CREATE FUNCTION [udf_FlightDestinationsByEmail](@email VARCHAR(50))
+ RETURNS INT AS 
+          BEGIN
+                DECLARE @destinationCount INT;
+                    SET @destinationCount = (
+                                                SELECT COUNT([fd].[Id])
+                                                  FROM [Passengers]
+                                                    AS [p]
+                                                  JOIN [FlightDestinations]
+                                                    AS [fd]
+                                                    ON [fd].[PassengerId] = [p].[Id]
+                                                 WHERE [p].[Email] = @email
+                                              GROUP BY [p].[Id]
+                                            )
+                     IF @destinationCount IS NULL
+                    SET @destinationCount = 0
+                 RETURN @destinationCount
+            END
+
+GO
+
+SELECT [dbo].[udf_FlightDestinationsByEmail] ('PierretteDunmuir@gmail.com')
+
+GO
+
+-- Problem 12
+CREATE OR ALTER PROCEDURE [usp_SearchByAirportName](@airportName VARCHAR(70))
+              AS 
+           BEGIN
+                SELECT [a].[AirportName],
+                       [p].[FullName],
+                       CASE  
+                             WHEN [fd].[TicketPrice] <= 400 THEN 'Low'
+                             WHEN [fd].[TicketPrice] BETWEEN 401 AND 1500 THEN 'Medium'
+                             ELSE 'High'
+                        END
+                    AS [LevelOfTicketPrice],
+                       [ac].[Manufacturer],
+                       [ac].[Condition],
+                       [t].[TypeName]
+                  FROM [Airports] 
+                    AS [a]
+                  JOIN [FlightDestinations]
+                    AS [fd]
+                    ON [a].[Id] = [fd].[AirportId]
+                  JOIN [Passengers]
+                    AS [p]
+                    ON [p].[Id] = [fd].[PassengerId]
+                  JOIN [Aircraft] 
+                    AS [ac]
+                    ON [ac].[Id] = [fd].[AircraftId]
+                  JOIN [AircraftTypes]
+                    AS [t]
+                    ON [ac].[TypeId] = [t].[Id]
+                 WHERE [a].[AirportName] = @airportName
+              ORDER BY [ac].[Manufacturer],
+                       [p].[FullName]
+             END
+
+GO
+
+EXEC usp_SearchByAirportName 'Sir Seretse Khama International Airport'
