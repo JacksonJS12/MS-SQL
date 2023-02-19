@@ -128,3 +128,62 @@ ORDER BY [Nationality],
  ORDER BY [c].[Name] DESC,
           [l].[Name],
           [s].[Name]
+
+
+-- Problem 07
+  SELECT [l].[Province],
+         [l].[Municipality],
+         [l].[Name],
+         COUNT([s].[Name])
+      AS [CountOfSites]
+    FROM [Locations]
+      AS [l]
+    JOIN [Sites]
+      AS [s]
+      ON [s].[LocationId] = [l].[Id] 
+   WHERE [Province] = 'Sofia'
+GROUP BY [l].[Name],
+         [l].[Province],
+         [l].[Municipality]
+ORDER BY [CountOfSites] DESC,
+         [l].[Name]
+
+
+-- Problem 08
+SELECT DISTINCT [s].[Name]
+             AS [Site],
+                [l].[Name]
+             AS [Location],
+                [l].[Municipality],
+                [l].[Province],
+                [s].[Establishment]
+           FROM [Sites]
+             AS [s]
+           JOIN [Locations]
+             AS [l]
+             ON [l].[Id] = [s].[LocationId]
+          WHERE [l].[Name] NOT LIKE ('B%') AND 
+                [l].[Name] NOT LIKE ('M%') AND
+                [l].[Name] NOT LIKE ('D%') AND
+                [s].[Establishment] LIKE ('%BC')
+       ORDER BY [s].[Name]  
+
+
+-- Problem 09
+   SELECT [t].[Name],
+          [t].[Age],
+          [t].[PhoneNumber],
+          [t].[Nationality],
+          ISNULL([b].[Name], '(no bonus prize)')
+       AS [Reward]
+     FROM [Tourists]
+       AS [t]
+LEFT JOIN [TouristsBonusPrizes]
+       AS [tb]
+       ON [tb].[TouristId] = [t].[Id]
+LEFT JOIN [BonusPrizes]
+       AS [b]
+       ON [tb].[BonusPrizeId] = [b].[Id]
+ ORDER BY [t].[Name]
+    
+       
